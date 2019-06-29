@@ -4,11 +4,12 @@ import cn.xuqplus.springsecuritydemo.entity.Role;
 import cn.xuqplus.springsecuritydemo.entity.User;
 import cn.xuqplus.springsecuritydemo.repository.RoleRepository;
 import cn.xuqplus.springsecuritydemo.repository.UserRepository;
-import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
 
 @Component
 public class Startup implements ApplicationListener<ApplicationReadyEvent> {
@@ -21,15 +22,41 @@ public class Startup implements ApplicationListener<ApplicationReadyEvent> {
 
   @Override
   public void onApplicationEvent(ApplicationReadyEvent applicationReadyEvent) {
-    Role admin = new Role("admin");
-    Role root = new Role("root");
-    roleRepository.save(admin);
-    roleRepository.save(root);
-    User user = new User("xqq", "123123",
-        new ArrayList<Role>() {{
-          add(admin);
-          add(root);
-        }});
-    userRepository.save(user);
+    if (!roleRepository.existsByName("normal")) {
+      Role role = new Role("normal");
+      roleRepository.save(role);
+    }
+    if (!roleRepository.existsByName("admin")) {
+      Role role = new Role("admin");
+      roleRepository.save(role);
+    }
+    if (!roleRepository.existsByName("root")) {
+      Role role = new Role("root");
+      roleRepository.save(role);
+    }
+    if (!userRepository.existsByUsername("root")) {
+      User user = new User("root", "123456",
+              new ArrayList<Role>() {{
+                add(roleRepository.getByName("normal"));
+                add(roleRepository.getByName("admin"));
+                add(roleRepository.getByName("root"));
+              }});
+      userRepository.save(user);
+    }
+    if (!userRepository.existsByUsername("admin")) {
+      User user = new User("admin", "123456",
+              new ArrayList<Role>() {{
+                add(roleRepository.getByName("normal"));
+                add(roleRepository.getByName("admin"));
+              }});
+      userRepository.save(user);
+    }
+    if (!userRepository.existsByUsername("normal")) {
+      User user = new User("normal", "123456",
+              new ArrayList<Role>() {{
+                add(roleRepository.getByName("normal"));
+              }});
+      userRepository.save(user);
+    }
   }
 }

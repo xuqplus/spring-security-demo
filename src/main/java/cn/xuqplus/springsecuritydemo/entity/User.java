@@ -1,15 +1,16 @@
 package cn.xuqplus.springsecuritydemo.entity;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 @Entity
 public class User extends BaseEntity implements UserDetails {
@@ -22,7 +23,7 @@ public class User extends BaseEntity implements UserDetails {
   }
 
   public User(String username, String password,
-      List<Role> roles) {
+              List<Role> roles) {
     this.username = username;
     this.password = password;
     this.roles = roles;
@@ -36,7 +37,7 @@ public class User extends BaseEntity implements UserDetails {
       return authorities;
     }
     for (Role role : roles) {
-      authorities.add(new SimpleGrantedAuthority(role.name));
+      authorities.add(new SimpleGrantedAuthority(String.format("ROLE_%s", role.name)));
     }
     return authorities;
   }
